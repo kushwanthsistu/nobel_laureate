@@ -33,4 +33,11 @@
     top : 70px ;
     bottom: 0px;
     overflow: scroll;
+    width: 100%;
+}
+
+#darkmode {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
 }
