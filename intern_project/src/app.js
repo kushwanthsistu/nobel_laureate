@@ -6,6 +6,7 @@ import Sideblock from "./components/sideblock";
 export default function App() {
     const [data, setdata] = React.useState([])
     const [displaydata, setdisplaydata] = React.useState([])
+    const [darkdisplay, setdarkdisplay] = React.useState([])
     const [startdata, setstart] = React.useState({
         startyear : "",
         startinvalid : false
@@ -16,6 +17,7 @@ export default function App() {
     })
     const [category, setcategory] = React.useState("all")
     const [mode, setmode] = React.useState(false)
+    const [sidepanel, setsidepanel] = React.useState(false)
     console.log("rendered")
     React.useEffect(() => {
         fetch("https://api.nobelprize.org/v1/prize.json")
@@ -74,13 +76,26 @@ export default function App() {
                         <Card 
                             key = {index.toString()}
                             {...info}
-                            mode = {mode}
+                            mode = {false}
                         />
                     )
                 }
             })
         })
-        console.log(displaydata)
+            setdarkdisplay(() => {
+                return data.map((info, index) => {
+                    if(parseInt(info.year) >= parseInt(startdata.startyear) && parseInt(info.year) <= parseInt(enddata.endyear)) {
+                        if(category == "all" || category === info.category)
+                        return (
+                            <Card 
+                                key = {index.toString()}
+                                {...info}
+                                mode = {true}
+                            />
+                        )
+                    }
+                })
+            })
         }
     }
 
@@ -141,11 +156,16 @@ console.log(displaydata)
         setcategory(event.target.value)
     }
 
+    function sidepaneloperation() {
+        setsidepanel(!sidepanel)
+    }
+
     return (
         <div className="vh-100" id="outerblock">
             <Header 
                 mode = {mode}
                 changemode = {changemode}
+                sidepaneloperation = {sidepaneloperation}
             />
             <div  id="innerblock" style={{backgroundColor : mode ? "black" : "white", color : mode ? "white" : "black"}}>
             <div id="sideblock">
@@ -159,9 +179,20 @@ console.log(displaydata)
                     mode = {mode}
                 />
             </div>
-            <div className="mt-2">
+            <div id="sideblockreduced" style={{display : sidepanel ? "block" : "none", backgroundColor : mode ? "black" : "white"}}>
+                <Sideblock 
+                    handleclick = {filter}
+                    changestart = {changestartyear}
+                    changeend = {changeendyear}
+                    changecategory = {categorychange}
+                    {...startdata}
+                    {...enddata}
+                    mode = {mode}
+                />
+            </div>
+            <div className="mt-2" id="mainpanel">
             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-2">
-            {displaydata.length ? displaydata : list}
+            {displaydata.length ? (mode ? darkdisplay : displaydata) : list}
             </div></div>
             </div>
         </div>
